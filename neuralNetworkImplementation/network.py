@@ -6,7 +6,7 @@ gradient descent
 import random
 import numpy as np
 import pickle
-
+import pandas as pd
 class Network(object):
 
     def __init__(self, sizes,is_from_file=False):
@@ -27,8 +27,8 @@ class Network(object):
             self.biases = pickle.load(infile)
             infile.close()
 
-            print("weights: ",self.weights)
-            print("biases: ",self.biases)
+            #print("weights: ",self.weights)
+            #print("biases: ",self.biases)
 
         else:        
             self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
@@ -45,7 +45,7 @@ class Network(object):
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None,save_interval=100):
+            test_data=None,save_interval=10):
         """Train the model in stochastic gradient descent algorithm
             Training data is a tuple of (x,y) where x and y are input and output vectors
         """
@@ -143,6 +143,8 @@ class Network(object):
         """Confusion matrix"""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
+        #print()
+        s = sum(int(x == y) for (x, y) in test_results)
         n = self.sizes[-1]
         print("n: ",n)
         matrix = np.zeros((n,n))
@@ -152,6 +154,7 @@ class Network(object):
 
         print("row index of an entry-> predicted class\n col index of an entry-> actual class\n")
         print(matrix)
+        return s
 
     def cost_derivative(self, output_activations, y):
         """Error in last layer"""

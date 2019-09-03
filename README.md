@@ -11,3 +11,6 @@ This repository will contain small machine learning related projects. Language o
 
 ### Neural Network Projects
 - Single layer perceptron. with visualization of convergence as a line separating 2 classes of points.
+
+### Data Mining Projects
+- ID3 algorithm implementation
