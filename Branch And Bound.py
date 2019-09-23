@@ -1,12 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-input("Enter no of features",D)
-input("Enter no of features to select",d)
+D = input("Enter no of features ")
+d = input("Enter no of features to select ")
+k = input("Enter the features separated by space ")
+
+D = int(D)
+d = int(d)
+k = k.split(" ")
+fl = []
+for numstr in k:
+    fl.append(int(numstr))
+#print(D,d,fl)
 
 def fitness(feature):
-
-    return sum(feature)
+    return pow(3,sum(feature))
+    #return sum(feature)
 
 class tree:
     def __init__(self,features,DD,dd):
@@ -16,13 +25,14 @@ class tree:
         self.totalLevels = DD-dd+1
         self.features = features
         self.max = 0
+        self.best_features = None
         self.represent = {}
         for i in range(self.totalLevels):
             self.represent[i] = []
     
     def branch_and_bound(self):
         preserve = []
-        self.root = grow_tree(self,self.features,preserve,0)
+        self.root = grow_tree(self,self.features,preserve,0,None)
 
         
 class treenode:
@@ -39,20 +49,25 @@ def diff(first, second):
 
 
 import random
-def grow_tree(t,features,preserve,l):
+def grow_tree(t,features,preserve,l,leave_feature):
     
+    val = fitness(features)
+    if(val<=t.max):
+        return None
     #print(features,preserve,l)
     n = treenode(features,l)
      #try to print t
+    #print(leave_feature,end=' ')
     for i in range(l):
-        print("\t",end='')
-    print(n.selected_features)
+        print("---- ",end='')
+    print(leave_feature,'----',n.selected_features)
 
-    val = fitness(features)
-    if(l>=t.totalLevels-1 or val<t.max): # bound and base case
+    
+    if(l>=t.totalLevels-1 or val<=t.max): # bound and base case
         if(l==t.totalLevels-1): #root node
             if(val>t.max):
                 t.max = val
+                t.best_features = features
                 #print("***",val)
         return n
     else:
@@ -77,14 +92,15 @@ def grow_tree(t,features,preserve,l):
         for i in range(no_children-1,-1,-1):
             child_features = diff(features,[child_leave_feature[i]])
             #print(features,"------",[child_leave_feature[i]],"------",child_features)
-            n.children.append(grow_tree(t,child_features,child_preserve[i],l+1))
+            n.children.append(grow_tree(t,child_features,child_preserve[i],l+1,r[i]))
 
         
         return n
 
 
 #breakpoint()
-t = tree([1,2,3,4,5,6],6,2)
+t = tree(fl,D,d)
+print("\n-------The Branch and Bound tree------")
 t.branch_and_bound()
-print(t.max)
+print("Best features are: ",t.best_features)
 
