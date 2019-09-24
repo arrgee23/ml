@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
+import numpy as np
+from graphviz import Digraph
+
+from graphviz import Graph
+dot = Digraph(comment='branch and bound')
 
 D = input("Enter no of features ")
-d = input("Enter no of features to select ")
+d = input("Enter no of features to select ")    
 k = input("Enter the features separated by space ")
 
 D = int(D)
@@ -10,12 +15,19 @@ d = int(d)
 k = k.split(" ")
 fl = []
 for numstr in k:
-    fl.append(int(numstr))
+    fl.append(float(numstr))
 #print(D,d,fl)
 
 def fitness(feature):
-    return pow(3,sum(feature))
-    #return sum(feature)
+    f = np.dot(feature,feature)
+    #print(f)
+    """sum = 0
+    for i in range(f.shape[0]):
+        sum += f[i]"""
+
+    #print(sum)
+    #return pow(3,f)
+    return f
 
 class tree:
     def __init__(self,features,DD,dd):
@@ -47,6 +59,11 @@ def diff(first, second):
         second = set(second)
         return [item for item in first if item not in second]
 
+def minimum(list1,list2):
+    if(list1>list2):
+        return list2
+    else:
+        return list1
 
 import random
 def grow_tree(t,features,preserve,l,leave_feature):
@@ -62,6 +79,7 @@ def grow_tree(t,features,preserve,l,leave_feature):
         print("---- ",end='')
     print(leave_feature,'----',n.selected_features)
 
+    dot.node(str(n.selected_features),str(n.selected_features))
     
     if(l>=t.totalLevels-1 or val<=t.max): # bound and base case
         if(l==t.totalLevels-1): #root node
@@ -76,11 +94,12 @@ def grow_tree(t,features,preserve,l,leave_feature):
         copy_preserve = preserve.copy()
         child_leave_feature = []
         child_preserve = []
-
-        r = random.sample(diff(features,preserve),no_children)
-
+        
+        m = minimum(no_children,len(diff(features,preserve)))
+        r = random.sample(diff(features,preserve),m)
+        r.sort(reverse=True)
         #buid children properties
-        for i in range(no_children):
+        for i in range(m):
             #r = None
             #while(r in child_leave_feature):
             
@@ -89,9 +108,11 @@ def grow_tree(t,features,preserve,l,leave_feature):
             child_preserve.append(copy_preserve)
             copy_preserve = copy_preserve+[r[i]]
 
-        for i in range(no_children-1,-1,-1):
+        for i in range(m-1,-1,-1):
             child_features = diff(features,[child_leave_feature[i]])
             #print(features,"------",[child_leave_feature[i]],"------",child_features)
+            if(fitness(n.selected_features)>t.max):
+                dot.edge(str(n.selected_features),str(child_features),label=str(child_leave_feature[i]))
             n.children.append(grow_tree(t,child_features,child_preserve[i],l+1,r[i]))
 
         
@@ -104,3 +125,4 @@ print("\n-------The Branch and Bound tree------")
 t.branch_and_bound()
 print("Best features are: ",t.best_features)
 
+dot.render('save.png',format='png')
