@@ -125,4 +125,4 @@ print("\n-------The Branch and Bound tree------")
 t.branch_and_bound()
 print("Best features are: ",t.best_features)
 
-dot.render('save.png',format='png')
+dot.render('save',format='png')
