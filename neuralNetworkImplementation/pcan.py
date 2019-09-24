@@ -29,9 +29,7 @@ class PCAN(object):
 
         else:        
             
-            self.weights = np.array([np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])])
-            self.weights = self.weights[0]
-            """
+            a = np.array([np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])])
             #a= np.array([[1,1],[2,2]])
             #print(a[0].shape)
             a = a[0]
@@ -43,12 +41,10 @@ class PCAN(object):
                 for j in range(len(a[i])):
                     a[i][j]=a[i][j]/np.math.sqrt(sumrow)
 
-            """
-            
-            
+            self.weights = a
             #print(self.weights)
 
-    def train(self,x,eta,num_epoch=1000):
+    def train(self,x,eta,num_epoch=10000):
         # w = out*in... x=m*in y=out*1
         e = x.copy()
         epsilon = 0.0005
@@ -61,29 +57,30 @@ class PCAN(object):
                 
                 #loop for each example
                 for k in range(x.shape[0]): 
-                    y = x[k]*self.weights[j].T # (1*in)(in*1)=y = 1*1
+                    y = np.dot(x[k],self.weights[j].T) # (1*in)(in*1)=y = 1*1
                     # self.weights[k] = 1*in
                     bkup = self.weights[j].copy()
-                    self.weights[j] = bkup + eta*y*(e[k] - y*bkup) #1*in
+                    self.weights[j] = bkup + eta*np.dot(y,(e[k] - np.dot(y,bkup))) #1*in
                     
                     # break if the change is small
+                    """
                     a = self.weights[j] - bkup
-                    
+                    print(sum(a*a))
                     if(sum(a*a)<epsilon):
                         break
-                
+                    """
                 #todo decrease epsilon
             
             #update error after stabilization of last set of weights
             for k in range(x.shape[0]): 
-                y = x[k]*self.weights[j].T # (1*in)(in*1)=y = 1*1
+                y = np.dot(x[k],self.weights[j].T) # (1*in)(in*1)=y = 1*1
                 e[k] = e[k] - y*self.weights[j]
 
 
 nn = PCAN([2,1])
-print(nn.weights)
-x = np.array([[1,2],[2,4.2]])
-nn.train(x,0.005)
+#print(nn.weights)
+x = np.array([[0,3],[0,4],[0,5]])
+nn.train(x,0.0005)
 print(nn.weights)
 """
 print(nn.weights)
