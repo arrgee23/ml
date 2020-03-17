@@ -14,3 +14,7 @@ This repository will contain small machine learning related projects. Language o
 
 ### Data Mining Projects
 - ID3 algorithm implementation
+
+### PR projects
+- SVM
+- Mean Shift Algorithm
